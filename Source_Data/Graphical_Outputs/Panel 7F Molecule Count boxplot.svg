@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 288.00 216.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    line, polyline, path, rect, circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA=='>
+    <rect x='59.04' y='59.04' width='198.72' height='83.52' />
+  </clipPath>
+</defs>
+<polyline points='75.60,137.20 149.20,137.20 149.20,131.65 130.80,131.08 149.20,130.50 149.20,119.96 75.60,119.96 75.60,130.50 94.00,131.08 75.60,131.65 ' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='94.00' y1='131.08' x2='130.80' y2='131.08' style='stroke-width: 2.25; stroke-linecap: butt;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='112.40' y1='139.47' x2='112.40' y2='137.20' style='stroke-width: 0.75; stroke-dasharray: 4.00,4.00;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='112.40' y1='94.11' x2='112.40' y2='119.96' style='stroke-width: 0.75; stroke-dasharray: 4.00,4.00;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='94.00' y1='139.47' x2='130.80' y2='139.47' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='94.00' y1='94.11' x2='130.80' y2='94.11' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<polyline points='75.60,137.20 149.20,137.20 149.20,131.65 130.80,131.08 149.20,130.50 149.20,119.96 75.60,119.96 75.60,130.50 94.00,131.08 75.60,131.65 75.60,137.20 ' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<polyline points='167.60,137.88 241.20,137.88 241.20,129.95 222.80,128.58 241.20,127.21 241.20,107.04 167.60,107.04 167.60,127.21 186.00,128.58 167.60,129.95 ' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='186.00' y1='128.58' x2='222.80' y2='128.58' style='stroke-width: 2.25; stroke-linecap: butt;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='204.40' y1='139.47' x2='204.40' y2='137.88' style='stroke-width: 0.75; stroke-dasharray: 4.00,4.00;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='204.40' y1='62.13' x2='204.40' y2='107.04' style='stroke-width: 0.75; stroke-dasharray: 4.00,4.00;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='186.00' y1='139.47' x2='222.80' y2='139.47' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<line x1='186.00' y1='62.13' x2='222.80' y2='62.13' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<polyline points='167.60,137.88 241.20,137.88 241.20,129.95 222.80,128.58 241.20,127.21 241.20,107.04 167.60,107.04 167.60,127.21 186.00,128.58 167.60,129.95 167.60,137.88 ' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MjU3Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<defs>
+  <clipPath id='cpMHwyODh8MjE2fDA='>
+    <rect x='0.00' y='0.00' width='288.00' height='216.00' />
+  </clipPath>
+</defs>
+<line x1='112.40' y1='142.56' x2='204.40' y2='142.56' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='112.40' y1='142.56' x2='112.40' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='204.40' y1='142.56' x2='204.40' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text x='72.05' y='168.48' style='font-size: 12.00px; font-family: Arial;' textLength='80.70px' lengthAdjust='spacingAndGlyphs'>Non-Retraction</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text x='177.05' y='168.48' style='font-size: 12.00px; font-family: Arial;' textLength='54.69px' lengthAdjust='spacingAndGlyphs'>Retraction</text></g>
+<line x1='59.04' y1='141.96' x2='59.04' y2='62.59' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='141.96' x2='51.84' y2='141.96' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='130.62' x2='51.84' y2='130.62' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='119.28' x2='51.84' y2='119.28' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='107.94' x2='51.84' y2='107.94' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='96.60' x2='51.84' y2='96.60' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='85.27' x2='51.84' y2='85.27' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='73.93' x2='51.84' y2='73.93' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<line x1='59.04' y1='62.59' x2='51.84' y2='62.59' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text transform='translate(41.76,145.30) rotate(-90)' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text transform='translate(41.76,117.95) rotate(-90)' style='font-size: 12.00px; font-family: Arial;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>150</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text transform='translate(41.76,83.94) rotate(-90)' style='font-size: 12.00px; font-family: Arial;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>300</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text x='-14.03' y='34.67' style='font-size: 14.40px; font-weight: bold; font-family: Arial;' textLength='344.85px' lengthAdjust='spacingAndGlyphs'>Number of Integrin avb5 Molecules by CMAC Type</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text x='94.67' y='211.68' style='font-size: 12.00px; font-family: Arial;' textLength='127.46px' lengthAdjust='spacingAndGlyphs'>2.77188275568813e-06</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text x='127.73' y='197.28' style='font-size: 12.00px; font-family: Arial;' textLength='61.35px' lengthAdjust='spacingAndGlyphs'>CMAC type</text></g>
+<g clip-path='url(#cpMHwyODh8MjE2fDA=)'><text transform='translate(12.96,193.85) rotate(-90)' style='font-size: 12.00px; font-family: Arial;' textLength='186.09px' lengthAdjust='spacingAndGlyphs'>Number of Integrin avb5 Molecules</text></g>
+<polyline points='59.04,142.56 257.76,142.56 257.76,59.04 59.04,59.04 59.04,142.56 ' style='stroke-width: 0.75;' clip-path='url(#cpMHwyODh8MjE2fDA=)' />
+</svg>

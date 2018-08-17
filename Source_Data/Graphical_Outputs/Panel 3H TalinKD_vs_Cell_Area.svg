@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 216.00 216.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    line, polyline, path, rect, circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA=='>
+    <rect x='59.04' y='59.04' width='126.72' height='83.52' />
+  </clipPath>
+</defs>
+<rect x='178.37' y='121.87' width='5.40' height='5.40' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<rect x='106.76' y='131.27' width='5.40' height='5.40' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<rect x='61.03' y='132.50' width='5.40' height='5.40' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<rect x='162.07' y='110.00' width='5.40' height='5.40' style='stroke-width: 0.75;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<polyline points='77.82,128.61 81.46,134.91 74.19,134.91 77.82,128.61 ' style='stroke-width: 0.75; stroke: #FF0000;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<circle cx='76.62' cy='133.39' r='2.70pt' style='stroke-width: 0.75; stroke: #00CD00;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+<defs>
+  <clipPath id='cpMHwyMTZ8MjE2fDA='>
+    <rect x='0.00' y='0.00' width='216.00' height='216.00' />
+  </clipPath>
+</defs>
+<line x1='75.49' y1='142.56' x2='173.86' y2='142.56' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='75.49' y1='142.56' x2='75.49' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='95.16' y1='142.56' x2='95.16' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='114.84' y1='142.56' x2='114.84' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='134.51' y1='142.56' x2='134.51' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='154.19' y1='142.56' x2='154.19' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='173.86' y1='142.56' x2='173.86' y2='149.76' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='70.32' y='168.48' style='font-size: 6.00px; font-family: Arial;' textLength='10.34px' lengthAdjust='spacingAndGlyphs'>-4.0</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='89.99' y='168.48' style='font-size: 6.00px; font-family: Arial;' textLength='10.34px' lengthAdjust='spacingAndGlyphs'>-3.5</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='109.67' y='168.48' style='font-size: 6.00px; font-family: Arial;' textLength='10.34px' lengthAdjust='spacingAndGlyphs'>-3.0</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='129.34' y='168.48' style='font-size: 6.00px; font-family: Arial;' textLength='10.34px' lengthAdjust='spacingAndGlyphs'>-2.5</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='149.02' y='168.48' style='font-size: 6.00px; font-family: Arial;' textLength='10.34px' lengthAdjust='spacingAndGlyphs'>-2.0</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='168.69' y='168.48' style='font-size: 6.00px; font-family: Arial;' textLength='10.34px' lengthAdjust='spacingAndGlyphs'>-1.5</text></g>
+<line x1='59.04' y1='139.47' x2='59.04' y2='62.13' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='59.04' y1='139.47' x2='51.84' y2='139.47' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='59.04' y1='124.00' x2='51.84' y2='124.00' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='59.04' y1='108.53' x2='51.84' y2='108.53' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='59.04' y1='93.07' x2='51.84' y2='93.07' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='59.04' y1='77.60' x2='51.84' y2='77.60' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<line x1='59.04' y1='62.13' x2='51.84' y2='62.13' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(41.76,143.64) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='8.34px' lengthAdjust='spacingAndGlyphs'>0.0</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(41.76,128.17) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='8.34px' lengthAdjust='spacingAndGlyphs'>0.2</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(41.76,112.70) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='8.34px' lengthAdjust='spacingAndGlyphs'>0.4</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(41.76,97.24) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='8.34px' lengthAdjust='spacingAndGlyphs'>0.6</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(41.76,81.77) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='8.34px' lengthAdjust='spacingAndGlyphs'>0.8</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(41.76,66.30) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='8.34px' lengthAdjust='spacingAndGlyphs'>1.0</text></g>
+<polyline points='59.04,142.56 185.76,142.56 185.76,59.04 59.04,59.04 59.04,142.56 ' style='stroke-width: 0.75;' clip-path='url(#cpMHwyMTZ8MjE2fDA=)' />
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text x='16.02' y='197.28' style='font-size: 12.00px; font-family: Arial;' textLength='212.75px' lengthAdjust='spacingAndGlyphs'>log2(Talin.KD.Data$Total.Talin.per.Cell)</text></g>
+<g clip-path='url(#cpMHwyMTZ8MjE2fDA=)'><text transform='translate(12.96,166.16) rotate(-90)' style='font-size: 12.00px; font-family: Arial;' textLength='130.72px' lengthAdjust='spacingAndGlyphs'>Talin.KD.Data$Cell.Area</text></g>
+<defs>
+  <clipPath id='cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA=='>
+    <rect x='59.04' y='59.04' width='126.72' height='83.52' />
+  </clipPath>
+</defs>
+<line x1='59.04' y1='136.39' x2='185.76' y2='118.25' style='stroke-width: 0.75; stroke: #BEBEBE;' clip-path='url(#cpNTkuMDR8MTg1Ljc2fDE0Mi41Nnw1OS4wNA==)' />
+</svg>

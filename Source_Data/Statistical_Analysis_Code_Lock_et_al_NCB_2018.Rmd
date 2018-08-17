@@ -1,0 +1,1523 @@
+---
+title: "Statistical Analsyses Code Lock et al NCB 2018"
+author: "Lock et al"
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    theme: cosmo
+    toc: yes
+    toc_depth: 4
+  html_document:
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 4
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  word_document:
+    toc: yes
+always_allow_html: yes
+---
+
+**
+
+**This R markdown document (.Rmd) contains analysis, visualisation and statistical testing relating to research paper "Reticular adhesions mediate cell-matrix attachment during mitosis” by Lock et al (NCB, 2018).** 
+
+**This code uses the R markdown framework and enables production of statistical and graphical outputs equivalent to those presented in the paper. Some purely aesthetic differences exist to final paper figures given subsequent editing (adobe illustrator) for figure embedding. All R packages necessary to run this code will be installed automatically upon running this code.**
+
+**This code calls the source data file named "Supplementary Table 1 Statistics Source Data.xlsx" and selects individual data sheets pertinent to each analysis. These sheets are named according the Figure Panel that they underpin. The user must place this source data file in a location of their choice and modify the "data_input_path" variable to reflect this location. Graphical outputs are saved according to the relevant Figure Panel names (with some additional descriptive information) to a location defined by the variable "panel_output_path". By default this is in a folder named "Graphical_Outputs" within the defined "data_input_path". Note that some figure panels were generated directly within Excel and these can be found within the source data file.**
+
+**In addition to specific .svg graphical outputs, this R markdown code will produce an HTML notebook that is useful to collectively preview and efficiently share outputs and their underlying code. This output HTML notebook file matches the name of this source .Rmd file, i.e. "Statistical_Analysis_Code_Lock_et_al_NCB_2018.nb.html".** 
+
+**
+
+
+# Setup
+```{r libraries and Environment Clean, message=FALSE, warning=FALSE, include=FALSE}
+# Install and apply required packages
+
+usePackage <- function(p) 
+{
+  if (!is.element(p, installed.packages()[,1]))
+    install.packages(p, dep = TRUE)
+  require(p, character.only = TRUE)
+}
+
+
+usePackage('beeswarm')
+usePackage('sm')
+usePackage('dplyr')
+usePackage('tidyverse')
+usePackage('readxl')
+usePackage('knitr')
+usePackage('svglite')
+usePackage('gplots')
+usePackage('ggplot2')
+usePackage('Hmisc')
+usePackage('zoo')
+usePackage('tidyquant')
+usePackage('spatstat')
+usePackage('gridExtra')
+usePackage('grid')
+usePackage('GGally') 
+
+# Clear all pre-existing objects from the current workspace
+rm(list = ls())
+
+```
+
+## Input Path
+
+```{r Input Path}
+# Set your path to input data
+
+data_input_path <- ".../Source_Data"
+
+# name of the source data file which you have placed in the above location
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+```
+
+
+## Output Path
+```{r Output Path}
+# Define panel output path
+
+panel_output_path <- paste(data_input_path, "Graphical_Outputs/", sep = "/")
+
+```
+
+# Figure 1
+
+## Import Data for Figure 1
+```{r mport Data for Figure 1}
+
+# Import individual data files
+Mass.Spec.Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig1A", col_names = TRUE)
+
+b5.int.vs.VN.conc <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig1G", col_names = TRUE)
+
+
+```
+
+## Mass Spec of Integrin subunits in long-term culture
+### Figure 1A boxplot of Integrin subunits spectral counts
+```{r Figure 1A boxplot of Integrin subunits spectral counts}
+
+#define panel_file_name
+Integrin_Spectral_Counts_File_Name <- "Panel 1A Integrin Spectral Counts Boxplot"
+
+boxplot(Mean.Spectral.Counts ~ Integrin.Subunit, data = Mass.Spec.Data, notch = FALSE, varwidth = FALSE, las=1, ylab = "Mean Spectral Counts", col = "grey", ylim = c(0, 50), outline = FALSE, boxlty = 0, whisklty = 0, staplelty = 0, medlwd = 0.5, boxfill = NA)
+beeswarm(Mean.Spectral.Counts ~ Integrin.Subunit, data = Mass.Spec.Data, method = 'center', add = T, col = "red", pch = 19, cex = 0.7)
+
+svglite(paste(panel_output_path, Integrin_Spectral_Counts_File_Name, ".svg", sep = ""), width=8, height=6)
+
+boxplot(Mean.Spectral.Counts ~ Integrin.Subunit, data = Mass.Spec.Data, notch = FALSE, varwidth = FALSE, las=1, ylab = "Mean Spectral Counts", col = "grey", ylim = c(0, 50), outline = FALSE, boxlty = 0, whisklty = 0, staplelty = 0, medlwd = 0.5, boxfill = NA)
+beeswarm(Mean.Spectral.Counts ~ Integrin.Subunit, data = Mass.Spec.Data, method = 'center', add = T, col = "red", pch = 19, cex = 0.7)
+
+dev.off()
+
+```
+#### T-testing for spectral count differences differences
+```{r}
+AVvsB1 <- subset(Mass.Spec.Data, Integrin.Subunit == "ITGAV" | Integrin.Subunit == "ITGB1")
+T_test_AVvsB1 <- t.test(Mean.Spectral.Counts ~ Integrin.Subunit, data = AVvsB1, alternative = "two.sided", paired = FALSE)$p.value
+
+T_test_AVvsB1
+
+B5vsB1 <- subset(Mass.Spec.Data, Integrin.Subunit == "ITGB5" | Integrin.Subunit == "ITGB1")
+T_test_B5vsB1 <- t.test(Mean.Spectral.Counts ~ Integrin.Subunit, data = B5vsB1, alternative = "two.sided", paired = FALSE)$p.value
+
+T_test_B5vsB1
+
+```
+
+
+## Integrin intensity responses to Vitronection concentration in talin-positive and talin-negative adhesions 
+
+### Boxplot of Integrin intensity vs Vitronection concentration in talin-positive and talin-negative adhesions
+```{r Boxplot of Integrin intensity vs Vitronection concentration in talin-positive and talin-negative adhesions}
+#define panel_file_name
+b5_Intensity_File_Name <- "Panel 1G Integrin b5 Intensity"
+
+names(b5.int.vs.VN.conc) <- c("Talin_Pos_vs_Neg", "Condition", "Mean.integrin.b5.Intensity")
+b5.int.vs.VN.conc$Talin_Pos_vs_Neg <- recode(b5.int.vs.VN.conc$Talin_Pos_vs_Neg, Atypical = "Talin_Neg")
+b5.int.vs.VN.conc$Talin_Pos_vs_Neg <- recode(b5.int.vs.VN.conc$Talin_Pos_vs_Neg, typical = "Talin_Pos")
+
+
+b5.int.vs.VN.conc$Group <- paste(b5.int.vs.VN.conc$Talin_Pos_vs_Neg, b5.int.vs.VN.conc$Condition, sep = "_")
+b5.int.vs.VN.conc$Group <- factor(b5.int.vs.VN.conc$Group, levels = c("Talin_Pos_1VN", "Talin_Neg_1VN", "Talin_Pos_3VN", "Talin_Neg_3VN", "Talin_Pos_10VN", "Talin_Neg_10VN"))
+
+
+ggplot(data = b5.int.vs.VN.conc, aes(x = Group, y = Mean.integrin.b5.Intensity)) + geom_boxplot(aes(fill = Talin_Pos_vs_Neg, ymin=..lower.., ymax=..upper..), outlier.shape=NA, notch = TRUE) + scale_fill_manual(values = c("Talin_Pos" = "#4F80BC", "Talin_Neg" = "#C0504F")) + theme_classic() + coord_cartesian(ylim = c(500, 1300)) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+svglite(paste(panel_output_path, b5_Intensity_File_Name, ".svg", sep = ""), width=5, height=8)
+
+ggplot(data = b5.int.vs.VN.conc, aes(x = Group, y = Mean.integrin.b5.Intensity)) + geom_boxplot(aes(fill = Talin_Pos_vs_Neg, ymin=..lower.., ymax=..upper..), outlier.shape=NA, notch = TRUE) + scale_fill_manual(values = c("Talin_Pos" = "#4F80BC", "Talin_Neg" = "#C0504F")) + theme_classic() + coord_cartesian(ylim = c(500, 1300)) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+dev.off()
+
+```
+
+#### Wilcoxon Rank Sum testing of b5 intensity changes given increased Vitronectin
+```{r Wilcoxon Rank Sum testing of b5 intensity changes given increased Vitronectin}
+TalinPos = subset(b5.int.vs.VN.conc, b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Pos")
+
+TalinPos_VN1_vs_VN3 <- subset(b5.int.vs.VN.conc, b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Pos" & b5.int.vs.VN.conc$Condition == "1VN" | b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Pos" & b5.int.vs.VN.conc$Condition == "3VN" )
+TalinPos_VN3_vs_VN10 <- subset(b5.int.vs.VN.conc, b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Pos" & b5.int.vs.VN.conc$Condition == "3VN" | b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Pos" & b5.int.vs.VN.conc$Condition == "10VN" )
+
+Mu_Test_TalinPos_VN1_vs_VN3 = wilcox.test(Mean.integrin.b5.Intensity ~ Condition, data = TalinPos_VN1_vs_VN3)$p.value
+Mu_Test_TalinPos_VN3_vs_VN10 = wilcox.test(Mean.integrin.b5.Intensity ~ Condition, data = TalinPos_VN3_vs_VN10)$p.value
+
+TalinNeg_VN1_vs_VN3 <- subset(b5.int.vs.VN.conc, b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Neg" & b5.int.vs.VN.conc$Condition == "1VN" | b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Neg" & b5.int.vs.VN.conc$Condition == "3VN" )
+TalinNeg_VN3_vs_VN10 <- subset(b5.int.vs.VN.conc, b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Neg" & b5.int.vs.VN.conc$Condition == "3VN" | b5.int.vs.VN.conc$Talin_Pos_vs_Neg == "Talin_Neg" & b5.int.vs.VN.conc$Condition == "10VN" )
+
+Mu_Test_TalinNeg_VN1_vs_VN3 = wilcox.test(Mean.integrin.b5.Intensity ~ Condition, data = TalinNeg_VN1_vs_VN3)$p.value
+Mu_Test_TalinNeg_VN3_vs_VN10 = wilcox.test(Mean.integrin.b5.Intensity ~ Condition, data = TalinNeg_VN3_vs_VN10)$p.value
+
+```
+
+# Figure 2
+
+## Import Data for Figure 2
+```{r mport Data for Figure 2}
+
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+FRAP.data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig2S_T", col_names = TRUE)
+
+STORM.Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig2V_W", col_names = TRUE)
+
+```
+
+## Analysis of integrin b5 FRAP recovery curves in Reticular and Focal adhesions
+
+### Integrin b5 FRAP analysis comparing Reticular and Focal adhesions
+```{r Integrin b5 FRAP analysis comparing Reticular and Focal adhesions}
+#define panel_file_name
+FRAP_Curve_File_Name <- "Panel 2S b5 FRAP recovery"
+
+names(FRAP.data) <- c("Standardised_b5_FRAP_recovery_relative_to_prebleach", "Time", "Bleach_ROI", "Reticular_vs_Focal")
+FRAP.data$Reticular_vs_Focal <- recode(FRAP.data$Reticular_vs_Focal, atypical = "Reticular")
+FRAP.data$Reticular_vs_Focal <- recode(FRAP.data$Reticular_vs_Focal, typical = "Focal")
+
+
+ggplot(data=FRAP.data, aes(x=Time, y=Standardised_b5_FRAP_recovery_relative_to_prebleach, colour = Reticular_vs_Focal), alpha = 0.1) +
+  stat_summary(fun.data ="mean_cl_normal", alpha = 0.5) + theme_classic() + scale_colour_manual(values = c("Reticular" = "#BF4C49", "Focal" = "#4B7FBB")) + geom_smooth(method = "loess", span = 0.2, size = 1, fill = "#3A3A3A")
+
+
+svglite(paste(panel_output_path, FRAP_Curve_File_Name, ".svg", sep = ""), width=6, height=4)
+
+ggplot(data=FRAP.data, aes(x=Time, y=Standardised_b5_FRAP_recovery_relative_to_prebleach, colour = Reticular_vs_Focal), alpha = 0.1) +
+  stat_summary(fun.data ="mean_cl_normal", alpha = 0.5) + theme_classic() + scale_colour_manual(values = c("Reticular" = "#BF4C49", "Focal" = "#4B7FBB")) + geom_smooth(method = "loess", span = 0.2, size = 1, fill = "#3A3A3A")
+
+dev.off()
+
+```
+
+### KS test of FRAP recovery curves
+```{r KS test of FRAP recovery curves}
+Reticular.FRAP.data <- subset(FRAP.data, Reticular_vs_Focal == "Reticular")
+Focal.FRAP.data <- subset(FRAP.data, Reticular_vs_Focal == "Focal")
+
+Reticular.FRAP.data.LOESS <- loess(Standardised_b5_FRAP_recovery_relative_to_prebleach ~ Time, data = Reticular.FRAP.data, span = 0.2)
+Focal.FRAP.data.LOESS <- loess(Standardised_b5_FRAP_recovery_relative_to_prebleach ~ Time, data = Focal.FRAP.data, span = 0.2)
+
+Reticular.FRAP.data.LOESS.singular <- unique(Reticular.FRAP.data.LOESS$fitted)
+Focal.FRAP.data.LOESS.singular <- unique(Focal.FRAP.data.LOESS$fitted)
+
+KS.Reticular.vs.Focal.FRAP <- ks.test(Reticular.FRAP.data.LOESS.singular, Focal.FRAP.data.LOESS.singular, alternative = "two.sided")
+
+print(KS.Reticular.vs.Focal.FRAP$p.value)
+```
+
+## Analysis of interphase STORM data
+
+### STORM data wrangling1
+```{r STORM data wrangling1}
+## Determine CMAC.type (Reticular vs Focal depending on presence of A in $File (column))
+
+CMAC.type = c()
+for (cluster in 1:length(STORM.Data$File) ) {
+  CMAC.type[cluster] <- if(grepl("A", STORM.Data$File[cluster]) == TRUE) {
+    "Reticular"
+  } else if(grepl("T", STORM.Data$File[cluster]) == TRUE) {
+    "Focal"
+  } else if(grepl("NR", STORM.Data$File[cluster]) == TRUE) {
+    "Non-Retraction"
+  } else {
+    "Retraction"
+  }
+}
+
+STORM.Data$CMAC.type <- cbind(as.character(CMAC.type))
+
+## Unique nanocluster ID generation = merge of Folder, File and Cluster
+
+# STORM.Data$Unique.ncID <- as.factor(paste(STORM.Data$Folder, STORM.Data$File, STORM.Data$Cluster))
+STORM.Data$Unique.CMACID <- as.factor(paste(STORM.Data$Folder, STORM.Data$File))
+STORM.Data <- as.data.frame(STORM.Data)
+```
+
+### Nearest Neighbour Analysis between localisations within unique nanoclusters
+```{r Nearest Neighbour Analysis between localisations within unique nanoclusters}
+## NND analysis of Incite3 data
+
+NNND <- c()
+for (i in 1:length(unique(STORM.Data$Unique.CMACID)) ) {
+  temp = STORM.Data[STORM.Data$Unique.CMACID == unique(STORM.Data$Unique.CMACID)[i], ]
+  NNND = append(NNND, nndist(temp[,7], temp[,8], k=1))
+}
+
+STORM.Data$NNND <- cbind(NNND)
+```
+
+### Boxplots summarising Nearest Neighbout Distance per nanocluster
+```{r Boxplots summarising Nearest Neighbout Distance per nanocluster}
+NNND.boxplot.filename <- "Panel 2V nearest neighbour boxplot"
+
+NNND.A = subset(STORM.Data$NNND, CMAC.type == "Reticular")
+
+NNND.T = subset(STORM.Data$NNND, CMAC.type == "Focal")
+
+
+svglite(paste(panel_output_path, NNND.boxplot.filename, ".svg", sep = ""), width=6, height=4)
+
+boxplot(NNND ~ CMAC.type, subset(STORM.Data, CMAC.type == "Reticular" | CMAC.type == "Focal"), notch = TRUE, outline = FALSE,
+        main = "Nearest Neighbour Distance of Nanocluster by CMAC Type",
+        xlab = "CMAC type", 
+        ylab = "Nearest Neighbour Distance (nm)",
+        plot = "TRUE"
+)
+
+dev.off()
+
+boxplot(NNND ~ CMAC.type, subset(STORM.Data, CMAC.type == "Reticular" | CMAC.type == "Focal"), notch = TRUE, outline = FALSE,
+        main = "Nearest Neighbour Distance of Nanocluster by CMAC Type",
+        xlab = "CMAC type", 
+        ylab = "Nearest Neighbour Distance (nm)",
+        plot = "TRUE"
+)
+
+```
+
+### Boxplots summarising Molecular Localization per nanocluster
+```{r Boxplots summarising Molecular Localization per nanocluster}
+Molecule.number.boxplot.filename <- "Panel 2W molecular number boxplot"
+
+Molecules.A = as.numeric(subset(STORM.Data$Molecules, CMAC.type == "Reticular"))
+
+Molecules.T = as.numeric(subset(STORM.Data$Molecules, CMAC.type == "Focal"))
+
+
+svglite(paste(panel_output_path, Molecule.number.boxplot.filename, ".svg", sep = ""), width=6, height=4)
+
+boxplot(as.numeric(Molecules) ~ CMAC.type, subset(STORM.Data, CMAC.type == "Reticular" | CMAC.type == "Focal"), notch = TRUE, outline = FALSE,
+        main = "Number of Integrin avb5 Molecules by CMAC Type",
+        xlab = "CMAC type", 
+        ylab = "Number of Integrin avb5 Molecules",
+        plot = "TRUE"
+        )
+
+dev.off()
+
+boxplot(as.numeric(Molecules) ~ CMAC.type, subset(STORM.Data, CMAC.type == "Reticular" | CMAC.type == "Focal"), notch = TRUE, outline = FALSE,
+        main = "Number of Integrin avb5 Molecules by CMAC Type",
+        xlab = "CMAC type", 
+        ylab = "Number of Integrin avb5 Molecules",
+        plot = "TRUE"
+        )
+
+```
+
+# Figure 3
+
+## Import Data for Figure 3
+```{r Import Data for Figure 3}
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+
+CytoD2h_vs_control <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig3C", col_names = TRUE)
+CytoD2h_vs_control <- CytoD2h_vs_control[,1:3]
+
+Adhesion.Assay.Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig3E", col_names = TRUE)
+Adhesion.Assay.Data <- Adhesion.Assay.Data[,1:4]
+
+Talin.KD.Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig3H_I", col_names = TRUE)
+
+```
+
+## Adhesion Assay
+### Fig 3E Plot Adhesion Levels per Condition
+```{r Plot Adhesion Levels per Condition}
+oldpar <- par()
+par(mar = c(10, 2.5, 1, 1))
+
+#define panel_file_name
+Adhesion_Assay_panel_file_name <- "Panel 3E Adhesion Assay Boxplots"
+
+Adhesion.Assay.Data$Condition <- factor(Adhesion.Assay.Data$Condition, unique(Adhesion.Assay.Data$Condition))
+
+max_adhesion <- max(Adhesion.Assay.Data$NumberObjects)
+Adhesion.Assay.Data$Normalised_Adhesion <- Adhesion.Assay.Data$NumberObjects/max_adhesion
+
+svglite(paste(panel_output_path, Adhesion_Assay_panel_file_name, ".svg", sep = ""), width=7.7, height=6.5)
+
+boxplot(Normalised_Adhesion ~ Condition, data = Adhesion.Assay.Data, notch = FALSE, varwidth = FALSE, outline = F, las=2, ylab = "Relative Cell Number", col = c("cs1wt -Cyto" = "#CB2327", "cs1wt +Cyto +RGD" = "#CB2327", "cs1b5 -Cyto" = "#4775A3", "cs1b5 -Cyto +RAD" = "#4775A3", "cs1b5 -Cyto +RGD" = "#9EC0E5", "cs1b5 +Cyto" = "#4775A3", "cs1b5 +Cyto +RAD" = "#4775A3", "cs1b5 +Cyto +RGD" = "#9EC0E5"), ylim = c(0,1.2))
+beeswarm(Normalised_Adhesion ~ Condition, data = Adhesion.Assay.Data, method = 'center', add = T, col = "lightgrey", pch = 19, cex = 0.7)
+
+dev.off()
+
+boxplot(Normalised_Adhesion ~ Condition, data = Adhesion.Assay.Data, notch = FALSE, varwidth = FALSE, outline = F, las=2, ylab = "Relative Cell Number", col = c("cs1wt -Cyto" = "#CB2327", "cs1wt +Cyto +RGD" = "#CB2327", "cs1b5 -Cyto" = "#4775A3", "cs1b5 -Cyto +RAD" = "#4775A3", "cs1b5 -Cyto +RGD" = "#9EC0E5", "cs1b5 +Cyto" = "#4775A3", "cs1b5 +Cyto +RAD" = "#4775A3", "cs1b5 +Cyto +RGD" = "#9EC0E5"), ylim = c(0,1.2))
+beeswarm(Normalised_Adhesion ~ Condition, data = Adhesion.Assay.Data, method = 'center', add = T, col = "lightgrey", pch = 19, cex = 0.7)
+
+
+```
+
+#### T-testing for Adhesion Level differences with Holm-Bonferroni p-value correction
+```{r T-testing for Adhesion Level differences with Holm-Bonferroni p-value correction}
+
+p_values <- c()
+for (i in 1:length(unique(Adhesion.Assay.Data$Condition))){
+  for (j in 1:length(unique(Adhesion.Assay.Data$Condition))){
+    Condition_1 = subset(Adhesion.Assay.Data, Adhesion.Assay.Data$Condition == unique(Adhesion.Assay.Data$Condition)[i])
+    Condition_1$Condition_Number = as.factor(i)
+    Condition_2 = subset(Adhesion.Assay.Data, Adhesion.Assay.Data$Condition == unique(Adhesion.Assay.Data$Condition)[j])
+    Condition_2$Condition_Number = as.factor(j+100)
+    Condition_Pair = rbind(Condition_1, Condition_2)
+    Condition_Pair_ttest = t.test(Normalised_Adhesion ~ Condition_Number, data = Condition_Pair, paired = FALSE)$p.value
+    p_values = rbind(p_values, Condition_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Adhesion.Assay.Data$Condition)),ncol = length(unique(Adhesion.Assay.Data$Condition)))
+columns <- as.vector(unique(Adhesion.Assay.Data$Condition))
+rows <- as.vector(unique(Adhesion.Assay.Data$Condition))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix1 <- matrix(corrected_p_values,nrow = length(unique(Adhesion.Assay.Data$Condition)),ncol = length(unique(Adhesion.Assay.Data$Condition)))
+columns <- as.vector(unique(Adhesion.Assay.Data$Condition))
+rows <- as.vector(unique(Adhesion.Assay.Data$Condition))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix1, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+
+```
+
+## Plot heatmap of corrected p_values
+```{r Plot heatmap of corrected p_values, fig.height=4, fig.width=5}
+heatmap.2(log(corrected_p_value_matrix1), dendrogram = 'none', Rowv = FALSE, Colv = FALSE, labRow = rows, labCol = columns, srtCol = 45, cexRow = 1, cexCol = 1, margins = c(7, 9), symm = TRUE, revC = FALSE, breaks = c(log(1e-300), log(1e-10), log(1e-6), log(0.001), log(0.01), log(0.05), log(1)), rowsep = 1:nrow(corrected_p_value_matrix1), colsep = 1:ncol(corrected_p_value_matrix1), sepcolor = 'darkgrey', sepwidth = c(0.02,0.02), trace = 'none', col = c("red", "orange", "green", "blue", "purple", "lightgrey"), denscol = NULL, keysize = 1.5, key.title = NA)
+```
+
+
+#### Wilcoxon Rank Sum testing for Adhesion Level differences
+```{r Wilcoxon Rank Sum testing for Adhesion Level differences}
+
+U_values <- c()
+for (i in 1:length(unique(Adhesion.Assay.Data$Condition))){
+  for (j in 1:length(unique(Adhesion.Assay.Data$Condition))){
+    Condition_1 = subset(Adhesion.Assay.Data, Adhesion.Assay.Data$Condition == unique(Adhesion.Assay.Data$Condition)[i])
+    Condition_1$Condition_Number = as.factor(i)
+    Condition_2 = subset(Adhesion.Assay.Data, Adhesion.Assay.Data$Condition == unique(Adhesion.Assay.Data$Condition)[j])
+    Condition_2$Condition_Number = as.factor(j+100)
+    Condition_Pair = rbind(Condition_1, Condition_2)
+    Condition_Pair_Utest = wilcox.test(Normalised_Adhesion ~ Condition_Number, data = Condition_Pair)$p.value
+    U_values = rbind(p_values, Condition_Pair_Utest)
+  }
+}
+
+U_values <- as.vector(U_values)
+
+U_value_matrix <- matrix(U_values, nrow = length(unique(Adhesion.Assay.Data$Condition)),ncol = length(unique(Adhesion.Assay.Data$Condition)))
+columns <- as.vector(unique(Adhesion.Assay.Data$Condition))
+rows <- as.vector(unique(Adhesion.Assay.Data$Condition))
+U_value_dataframe <- as.data.frame(U_value_matrix, row.names = rows)
+names(U_value_dataframe) <- columns
+
+print(U_value_dataframe)
+
+```
+
+## Talin KD effects
+### Plot and test Talin KD effects on cell area and integrin b5 intensity within adhesions
+```{r beeswarm plot of talin KD effects on cell spreading and b5 clustering}
+# beeswarm(Total.Talin.per.Cell ~ siRNA..Oligo, data = Talin.KD.Data, method = 'center', col = "black", pch = 19, cex = 1, ylim = c(0,1))
+# 
+# beeswarm(Cell.Area ~ siRNA..Oligo, data = Talin.KD.Data, method = 'center', col = "black", pch = 19, cex = 1, ylim = c(0,1))
+# 
+# beeswarm(Mean.Clustered.b5.per.Cell ~ siRNA..Oligo, data = Talin.KD.Data, method = 'center', col = "black", pch = 19, cex = 1)#, ylim = c(0,1))
+
+plot(log2(Talin.KD.Data$Total.Talin.per.Cell), Talin.KD.Data$Cell.Area, ylim = c(0,1), pch = c(0, 0, 0, 0, 2, 21), col = c("1", "1", "1", "1", "2", "3"))
+abline(lm(Talin.KD.Data$Cell.Area ~ log2(Talin.KD.Data$Total.Talin.per.Cell)), col = "grey")
+
+lm.cell.area_vs_talin.per.cell <- lm(Talin.KD.Data$Cell.Area ~ log2(Talin.KD.Data$Total.Talin.per.Cell))
+
+TalinKD_Cell_Area_panel_file_name <- "Panel 3H TalinKD_vs_Cell_Area"
+
+svglite(paste(panel_output_path, TalinKD_Cell_Area_panel_file_name, ".svg", sep = ""), width=3, height=3)
+plot(log2(Talin.KD.Data$Total.Talin.per.Cell), Talin.KD.Data$Cell.Area, ylim = c(0,1), pch = c(0, 0, 0, 0, 2, 21), col = c("1", "1", "1", "1", "2", "3"), cex.axis = 0.5, cex.label = 0.5)
+abline(lm(Talin.KD.Data$Cell.Area ~ log2(Talin.KD.Data$Total.Talin.per.Cell)), col = "grey")
+dev.off()
+
+
+plot(Talin.KD.Data$Total.Talin.per.Cell, log2(Talin.KD.Data$Mean.Clustered.b5.per.Cell), xlim = c(0,1), ylim = c(0,4), pch = c(0, 0, 0, 0, 2, 21),  col = c("1", "1", "1", "1", "2", "3"))
+abline(lm(log2(Talin.KD.Data$Mean.Clustered.b5.per.Cell) ~ Talin.KD.Data$Total.Talin.per.Cell), col = "grey")
+
+lm.b5.intensity_vs_talin.per.cell <- lm(log2(Talin.KD.Data$Mean.Clustered.b5.per.Cell) ~ Talin.KD.Data$Total.Talin.per.Cell)
+
+TalinKD_b5_Intensity_panel_file_name <- "Panel 3I TalinKD_vs_b5_Intensity"
+svglite(paste(panel_output_path, TalinKD_b5_Intensity_panel_file_name, ".svg", sep = ""), width=3, height=3)
+plot(Talin.KD.Data$Total.Talin.per.Cell, log2(Talin.KD.Data$Mean.Clustered.b5.per.Cell), xlim = c(0,1), ylim = c(0,4), pch = c(0, 0, 0, 0, 2, 21),  col = c("1", "1", "1", "1", "2", "3"), cex.axis = 0.5, cex.label = 0.5)
+abline(lm(log2(Talin.KD.Data$Mean.Clustered.b5.per.Cell) ~ Talin.KD.Data$Total.Talin.per.Cell), col = "grey")
+
+dev.off()
+```
+
+## Test CytoD effects on adhesion intensities
+#### Wilcoxon rank sum test of CytoD effect on vinculin and b5 intensity in adhesions
+```{r Wilcoxon rank sum test of CytoD effect on vinculin and b5 intensity in adhesions}
+names(CytoD2h_vs_control) <- c("Vinculin_Intensity", "b5_Intensity", "Condition")
+
+Vinculin_Intensity_mu_test <- wilcox.test(Vinculin_Intensity ~ Condition, data = CytoD2h_vs_control)$p.value
+print(Vinculin_Intensity_mu_test)
+
+b5_Intensity_mu_test <- wilcox.test(b5_Intensity ~ Condition, data = CytoD2h_vs_control)$p.value
+print(b5_Intensity_mu_test)
+```
+
+# Figure 5
+
+## Import Data for Figure 5
+```{r Import Data for Figure 5}
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+Primary.siRNA.Screen.Data <-  read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig5B_C", col_names = TRUE)
+
+Neo.LY.Drug.Treatment.Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig5D", col_names = TRUE)
+
+```
+
+## Analyse Primary siRNA Screen responses
+### Boxplot changes in reticular to focal adhesion b5 intensity ratio due to siRNA
+```{r Boxplot changes in reticular to focal adhesion b5 intensity ratio due to siRNA}
+siRNA_boxplot_summary_filename <- "Panel 5B siRNA boxplot summary"
+
+cell.numbers.primary.screen <- count(Primary.siRNA.Screen.Data, siRNA_Target)
+count(Primary.siRNA.Screen.Data, siRNA_Target)
+mean.cell.numbers.primary.screen <- summarise(cell.numbers.primary.screen, avg = mean(n), SD = sd(n), sum(n))
+summarise(cell.numbers.primary.screen, avg = mean(n), SD = sd(n), sum(n))
+
+ggplot(Primary.siRNA.Screen.Data, aes(x=siRNA_Target, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(siRNA_Treatment_Type))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Untreated","MOCK","SST_3Ctrl_Pool", "ON-TARGETplus Non-targeting Control",
+                          "siGENOME Non-targeting Control", "ITGAV", "ITGB5", "OCRL", "PI4KA",
+                          "PI4K2B", "PTEN", "PIP5K1B", "PIP5K1C", "PIK3C2A")) +
+  theme(axis.text.x  = element_text(angle=90)) +
+  ylim(-3, 6)#+
+
+svglite(paste(panel_output_path, siRNA_boxplot_summary_filename, ".svg", sep = ""), width=7, height=5)
+
+ggplot(Primary.siRNA.Screen.Data, aes(x=siRNA_Target, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(siRNA_Treatment_Type))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Untreated","MOCK","SST_3Ctrl_Pool", "ON-TARGETplus Non-targeting Control",
+                          "siGENOME Non-targeting Control", "ITGAV", "ITGB5", "OCRL", "PI4KA",
+                          "PI4K2B", "PTEN", "PIP5K1B", "PIP5K1C", "PIK3C2A")) +
+  theme(axis.text.x  = element_text(angle=90)) +
+  ylim(-3, 6)#+
+
+dev.off()
+
+```
+
+### Parallel coordinates plot of adhesion responses to siRNA
+```{r Parallel coordinates plot of adhesion responses to siRNA}
+siRNA_parcoord_summary_filename <- "Panel 5C siRNA parcoord summary"
+
+Primary_screen_siRNA_subset <- subset(Primary.siRNA.Screen.Data, siRNA_Target == "Untreated" | siRNA_Target == "MOCK" | siRNA_Target == "SST_3Ctrl_Pool" | siRNA_Target ==  "ON-TARGETplus Non-targeting Control" | siRNA_Target == "siGENOME Non-targeting Control" | siRNA_Target ==  "OCRL" | siRNA_Target ==  "PI4KA" | siRNA_Target == "PI4K2B" | siRNA_Target ==  "PTEN" | siRNA_Target ==  "PIP5K1B" | siRNA_Target ==  "PIP5K1C" | siRNA_Target ==  "PIK3C2A")
+
+Primary_screen_siRNA_subset_grouped <- aggregate(Primary_screen_siRNA_subset[, c(11,13,18)], list(Primary_screen_siRNA_subset$siRNA_Target), median)
+
+Primary_screen_siRNA_subset_grouped$Group.1 <- 
+  as.factor(Primary_screen_siRNA_subset_grouped$Group.1)
+
+names(Primary_screen_siRNA_subset_grouped) <- c("siRNA_Target", "Mean_Reticular_Adhesion_Intensity", "Mean_Focal_Adhesion_Intensity", "Ratio_Reticular_Focal_Adhesion_Intensity")
+
+svglite(paste(panel_output_path, siRNA_parcoord_summary_filename, ".svg", sep = ""), width=7, height=5)
+
+ggparcoord(Primary_screen_siRNA_subset_grouped, columns = c(2,3,4), groupColumn = 1, scale = "globalminmax", order = c(2,3,4)) + theme(axis.text.x  = element_text(angle=60, hjust = 1, size = 5))
+
+dev.off()
+
+ggparcoord(Primary_screen_siRNA_subset_grouped, columns = c(2,3,4), groupColumn = 1, scale = "globalminmax", order = c(2,3,4)) + theme(axis.text.x  = element_text(angle=60, hjust = 1, size = 5))
+
+```
+
+
+### Mann-Whitney test for significant siRNA treatment effects
+```{r Mann-Whitney test for significant siRNA treatment effects}
+siRNA.conditions.for.U.test <- subset(Primary.siRNA.Screen.Data, siRNA_Target != "Untreated" & siRNA_Target != "MOCK" & siRNA_Target != "SST_3Ctrl_Pool" & siRNA_Target != "siGENOME Non-targeting Control") 
+
+p_values <- c()
+for (i in 1:length(unique(siRNA.conditions.for.U.test$siRNA_Target))){
+  for (j in 1:length(unique(siRNA.conditions.for.U.test$siRNA_Target))){
+    siRNA_Target_1 = subset(siRNA.conditions.for.U.test, siRNA.conditions.for.U.test$siRNA_Target == unique(siRNA.conditions.for.U.test$siRNA_Target)[i])
+    siRNA_Target_1$siRNA_Target_Number = as.factor(i)
+    siRNA_Target_2 = subset(siRNA.conditions.for.U.test, siRNA.conditions.for.U.test$siRNA_Target == unique(siRNA.conditions.for.U.test$siRNA_Target)[j])
+    siRNA_Target_2$siRNA_Target_Number = as.factor(j+100)
+    siRNA_Target_Pair = rbind(siRNA_Target_1, siRNA_Target_2)
+    siRNA_Target_Pair_ttest = wilcox.test(Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score ~ siRNA_Target_Number, data = siRNA_Target_Pair)$p.value
+    p_values = rbind(p_values, siRNA_Target_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(siRNA.conditions.for.U.test$siRNA_Target)),ncol = length(unique(siRNA.conditions.for.U.test$siRNA_Target)))
+columns <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+rows <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix2 <- matrix(corrected_p_values,nrow = length(unique(siRNA.conditions.for.U.test$siRNA_Target)),ncol = length(unique(siRNA.conditions.for.U.test$siRNA_Target)))
+columns <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+rows <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix2, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+
+```
+
+### Plot heatmap of corrected p_values mann-whitney
+```{r Plot heatmap of corrected p_values mann-whitney, fig.height=6, fig.width=6}
+heatmap.2(log(corrected_p_value_matrix2), dendrogram = 'none', Rowv = FALSE, Colv = FALSE, labRow = rows, labCol = columns, srtCol = 45, cexRow = 1, cexCol = 1, margins = c(7, 9), symm = TRUE, revC = FALSE, breaks = c(log(1e-300), log(1e-50), log(1e-10), log(1e-6), log(0.001), log(0.01), log(0.05), log(1)), rowsep = 1:nrow(corrected_p_value_matrix2), colsep = 1:ncol(corrected_p_value_matrix2), sepcolor = 'darkgrey', sepwidth = c(0.02,0.02), trace = 'none', col = c("darkred", "red", "orange", "green", "blue", "purple", "lightgrey"), denscol = NULL, keysize = 1.5, key.title = NA)
+```
+
+## Analyse Neomycin and LY drug treatment responses
+
+### Boxplots of b5 adhesion intensity changes due to neomycin or LY
+```{r Boxplots of b5 adhesion intensity changes due to neomycin or LY}
+PIP_drug_boxplot_summary_filename <- "Panel 5D PIP drug boxplot summary"
+
+cell.numbers.NEO_LY.screen <- count(Neo.LY.Drug.Treatment.Data, Drug)
+count(Neo.LY.Drug.Treatment.Data, Drug)
+mean.cell.numbers.NEO_LY.screen <- summarise(cell.numbers.NEO_LY.screen, avg = mean(n), SD = sd(n), sum(n))
+summarise(cell.numbers.NEO_LY.screen, avg = mean(n), SD = sd(n), sum(n))
+
+svglite(paste(panel_output_path, PIP_drug_boxplot_summary_filename, ".svg", sep = ""), width=7, height=5)
+
+p1 <- ggplot(Neo.LY.Drug.Treatment.Data, aes(x=Drug, y=Median.Mean..z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("DMSO", "Neo_10mM","LY_25mM")) +
+  theme(axis.text.x  = element_text(angle=45, vjust = 0.5)) +
+  coord_cartesian(ylim=c(-3, 6)) + ylab("Mean Reticular Adhesion Intensity") + theme(legend.position="none")
+
+
+## plot T-CMAC intensity Z-score ggplot2 boxplot - per Drug 
+
+p2 <- ggplot(Neo.LY.Drug.Treatment.Data, aes(x=Drug, y=Median.Mean._T.CMACs.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("DMSO", "Neo_10mM","LY_25mM")) +
+  theme(axis.text.x  = element_text(angle=45, vjust = 0.5)) +
+  coord_cartesian(ylim=c(-3, 6)) + ylab("Mean Focal Adhesion Intensity") + theme(legend.position="none")
+
+## plot intensity ratio Z-score ggplot2 boxplot - per Drug 
+
+p3 <- ggplot(Neo.LY.Drug.Treatment.Data, aes(x=Drug, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("DMSO", "Neo_10mM","LY_25mM")) +
+  theme(axis.text.x  = element_text(angle=45, vjust = 0.5)) +
+  coord_cartesian(ylim=c(-3, 6)) + ylab("Ratio Reticular:Focal Adhesion Intensity") + theme(legend.position="none")
+
+grid.arrange(p1, p2, p3, ncol = 3)
+
+dev.off()
+
+p1 <- ggplot(Neo.LY.Drug.Treatment.Data, aes(x=Drug, y=Median.Mean..z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("DMSO", "Neo_10mM","LY_25mM")) +
+  theme(axis.text.x  = element_text(angle=45, vjust = 0.5)) +
+  coord_cartesian(ylim=c(-3, 6)) + ylab("Mean Reticular Adhesion Intensity") + theme(legend.position="none")
+
+
+## plot T-CMAC intensity Z-score ggplot2 boxplot - per Drug 
+
+p2 <- ggplot(Neo.LY.Drug.Treatment.Data, aes(x=Drug, y=Median.Mean._T.CMACs.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("DMSO", "Neo_10mM","LY_25mM")) +
+  theme(axis.text.x  = element_text(angle=45, vjust = 0.5)) +
+  coord_cartesian(ylim=c(-3, 6)) + ylab("Mean Focal Adhesion Intensity") + theme(legend.position="none")
+
+## plot intensity ratio Z-score ggplot2 boxplot - per Drug 
+
+p3 <- ggplot(Neo.LY.Drug.Treatment.Data, aes(x=Drug, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("DMSO", "Neo_10mM","LY_25mM")) +
+  theme(axis.text.x  = element_text(angle=45, vjust = 0.5)) +
+  coord_cartesian(ylim=c(-3, 6)) + ylab("Ratio Reticular:Focal Adhesion Intensity") + theme(legend.position="none")
+
+grid.arrange(p1, p2, p3, ncol = 3)
+
+
+```
+
+### Mann-Whitney test for significant Drug treatment effects on Reticular adhesion intensity
+```{r Mann-Whitney test for significant Drug treatment effects on Reticular adhesion intensity}
+p_values <- c()
+for (i in 1:length(unique(Neo.LY.Drug.Treatment.Data$Drug))){
+  for (j in 1:length(unique(Neo.LY.Drug.Treatment.Data$Drug))){
+    Drug_1 = subset(Neo.LY.Drug.Treatment.Data, Neo.LY.Drug.Treatment.Data$Drug == unique(Neo.LY.Drug.Treatment.Data$Drug)[i])
+    Drug_1$Drug_Number = as.factor(i)
+    Drug_2 = subset(Neo.LY.Drug.Treatment.Data, Neo.LY.Drug.Treatment.Data$Drug == unique(Neo.LY.Drug.Treatment.Data$Drug)[j])
+    Drug_2$Drug_Number = as.factor(j+100)
+    Drug_Pair = rbind(Drug_1, Drug_2)
+    Drug_Pair_ttest = wilcox.test(Median.Mean..z.score ~ Drug_Number, data = Drug_Pair)$p.value
+    p_values = rbind(p_values, Drug_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Neo.LY.Drug.Treatment.Data$Drug)),ncol = length(unique(Neo.LY.Drug.Treatment.Data$Drug)))
+columns <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+rows <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix3 <- matrix(corrected_p_values,nrow = length(unique(Neo.LY.Drug.Treatment.Data$Drug)),ncol = length(unique(Neo.LY.Drug.Treatment.Data$Drug)))
+columns <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+rows <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix3, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+```
+
+### Mann-Whitney test for significant Drug treatment effects on Focal adhesion intensity
+```{r Mann-Whitney test for significant Drug treatment effects on Focal adhesion intensity}
+p_values <- c()
+for (i in 1:length(unique(Neo.LY.Drug.Treatment.Data$Drug))){
+  for (j in 1:length(unique(Neo.LY.Drug.Treatment.Data$Drug))){
+    Drug_1 = subset(Neo.LY.Drug.Treatment.Data, Neo.LY.Drug.Treatment.Data$Drug == unique(Neo.LY.Drug.Treatment.Data$Drug)[i])
+    Drug_1$Drug_Number = as.factor(i)
+    Drug_2 = subset(Neo.LY.Drug.Treatment.Data, Neo.LY.Drug.Treatment.Data$Drug == unique(Neo.LY.Drug.Treatment.Data$Drug)[j])
+    Drug_2$Drug_Number = as.factor(j+100)
+    Drug_Pair = rbind(Drug_1, Drug_2)
+    Drug_Pair_ttest = wilcox.test(Median.Mean._T.CMACs.z.score ~ Drug_Number, data = Drug_Pair)$p.value
+    p_values = rbind(p_values, Drug_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Neo.LY.Drug.Treatment.Data$Drug)),ncol = length(unique(Neo.LY.Drug.Treatment.Data$Drug)))
+columns <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+rows <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix4 <- matrix(corrected_p_values,nrow = length(unique(Neo.LY.Drug.Treatment.Data$Drug)),ncol = length(unique(Neo.LY.Drug.Treatment.Data$Drug)))
+columns <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+rows <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix4, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+```
+### Mann-Whitney test for significant Drug treatment effects on intensity ratio Z-score
+```{r Mann-Whitney test for significant Drug treatment effects on intensity ratio Z-score}
+p_values <- c()
+for (i in 1:length(unique(Neo.LY.Drug.Treatment.Data$Drug))){
+  for (j in 1:length(unique(Neo.LY.Drug.Treatment.Data$Drug))){
+    Drug_1 = subset(Neo.LY.Drug.Treatment.Data, Neo.LY.Drug.Treatment.Data$Drug == unique(Neo.LY.Drug.Treatment.Data$Drug)[i])
+    Drug_1$Drug_Number = as.factor(i)
+    Drug_2 = subset(Neo.LY.Drug.Treatment.Data, Neo.LY.Drug.Treatment.Data$Drug == unique(Neo.LY.Drug.Treatment.Data$Drug)[j])
+    Drug_2$Drug_Number = as.factor(j+100)
+    Drug_Pair = rbind(Drug_1, Drug_2)
+    Drug_Pair_ttest = wilcox.test(as.numeric(Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score) ~ Drug_Number, data = Drug_Pair)$p.value 
+    p_values = rbind(p_values, Drug_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Neo.LY.Drug.Treatment.Data$Drug)),ncol = length(unique(Neo.LY.Drug.Treatment.Data$Drug)))
+columns <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+rows <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix5 <- matrix(corrected_p_values,nrow = length(unique(Neo.LY.Drug.Treatment.Data$Drug)),ncol = length(unique(Neo.LY.Drug.Treatment.Data$Drug)))
+columns <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+rows <- as.vector(unique(Neo.LY.Drug.Treatment.Data$Drug))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix5, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+```
+# Figure 6
+
+## Import Data for Figure 6
+```{r mport Data for Figure 6}
+
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+
+Proliferation <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig6A", col_names = TRUE)
+Proliferation$Day <- as.factor(Proliferation$Day)
+
+
+EDU_Incorporation_Percentage <-  read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig6B", col_names = TRUE)
+EDU_Incorporation_Percentage <- EDU_Incorporation_Percentage[,1:2]
+
+```
+
+## Summarise Proliferation data per Condition per Day
+```{r Summarise Proliferation data per Condition per Day}
+Prol_Sum <- Proliferation %>%
+  group_by(.dots = c('Condition', 'Day')) %>%
+  summarise(
+    mean_proliferation = mean(Relative.Proliferation, na.rm = TRUE),
+    SD_proliferation = sd(Relative.Proliferation, na.rm = TRUE)
+  )
+```
+
+### Plot Cell Proliferation Comparison of control vs b5KD
+```{r Plot Cell Proliferation Comparison of control vs b5KD}
+proliferation_linechart_filename <- "Panel 6A proliferation linechart"
+
+# The errorbars overlapped, so use position_dodge to move them horizontally
+pd <- position_dodge(0.1) # move them .05 to the left and right
+
+svglite(paste(panel_output_path, proliferation_linechart_filename, ".svg", sep = ""), width=4, height=3)
+
+ggplot(Prol_Sum, aes(x=Day, y=mean_proliferation, colour=Condition, group=Condition)) + 
+    geom_errorbar(aes(ymin=mean_proliferation-SD_proliferation, ymax=mean_proliferation+SD_proliferation), width=.1, position=pd) +
+  scale_color_manual(values = c("Control" = "#49494A", "b5KD" = "#EC1C24")) +
+    geom_line(position=pd, size = 1) +
+    geom_point(position=pd, size=3, shape=19) + # 21 is filled circle
+    xlab("Day") +
+    ylab("Relative Proliferation") +
+    theme_light()
+
+dev.off()
+
+ggplot(Prol_Sum, aes(x=Day, y=mean_proliferation, colour=Condition, group=Condition)) + 
+    geom_errorbar(aes(ymin=mean_proliferation-SD_proliferation, ymax=mean_proliferation+SD_proliferation), width=.1, position=pd) +
+  scale_color_manual(values = c("Control" = "#49494A", "b5KD" = "#EC1C24")) +
+    geom_line(position=pd, size = 1) +
+    geom_point(position=pd, size=3, shape=19) + # 21 is filled circle
+    xlab("Day") +
+    ylab("Relative Proliferation") +
+    theme_light()
+
+```
+
+### T-testing Cell Proliferation Comparison per Condition per Day
+```{r T-testing Cell Proliferation Comparison per Condition per Day}
+
+Proliferation$Day <- as.factor(Proliferation$Day)
+
+p_values <- c()
+for (i in 1:length(unique(Proliferation$Day))){
+  
+    single_day_data = subset(Proliferation, Proliferation$Day == unique(Proliferation$Day)[i])
+    
+    Control_vs_b5KD_per_day_ttest = t.test(Relative.Proliferation ~ Condition, data = single_day_data, paired = FALSE)$p.value
+    p_values = rbind(p_values, Control_vs_b5KD_per_day_ttest)
+
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = 1,ncol = length(p_values))
+columns <- as.vector(paste("Day", unique(Proliferation$Day), sep = " "))
+rows <- paste(unique(Proliferation$Condition)[1], unique(Proliferation$Condition)[2], sep = "_vs_")
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+print(p_value_dataframe)
+
+```
+
+
+## EDU Incorporation Comparison per Condition
+### Fig 6B Plot EDU Incorporation Boxplot per Condition
+```{r Plot EDU Incorporation Boxplot per Condition}
+
+#define panel_file_name
+EDU_boxplot_panel_file_name <- "Panel 6B EDU Incorporation Boxplots"
+
+EDU_Incorporation_Percentage$Condition <- factor(EDU_Incorporation_Percentage$Condition, c("Control", "b5KD"))
+
+svglite(paste(panel_output_path, EDU_boxplot_panel_file_name, ".svg", sep = ""), width=4, height=6)
+
+boxplot(Percentage.EDU.positive.Cells.per.image ~ Condition, data = EDU_Incorporation_Percentage, notch = T, varwidth = T, outline = F, ylab = "% EDU positive cells", col = c(control = "#49494A", b5KD = "#EC1C24"), ylim = c(0,115))
+beeswarm(Percentage.EDU.positive.Cells.per.image ~ Condition, data = EDU_Incorporation_Percentage, method = 'center', add = T, col = "steelblue2", pch = 1, cex = 1.3)
+
+dev.off()
+
+boxplot(Percentage.EDU.positive.Cells.per.image ~ Condition, data = EDU_Incorporation_Percentage, notch = T, varwidth = T, outline = F, ylab = "% EDU positive cells", col = c(control = "#49494A", b5KD = "#EC1C24"), ylim = c(0,115))
+beeswarm(Percentage.EDU.positive.Cells.per.image ~ Condition, data = EDU_Incorporation_Percentage, method = 'center', add = T, col = "steelblue2", pch = 1, cex = 1.3)
+
+
+```
+
+#### Fig6B Mann-Whitney µ test for EDU Incorporation differences
+```{r Mann-Whitney µ test for EDU Incorporation differences}
+
+#Note: Equivalent to Wilcoxon rank sum test as data is unpaired
+
+Utest.b5KD.vs.control_EDU <- wilcox.test(Percentage.EDU.positive.Cells.per.image ~ Condition, data = EDU_Incorporation_Percentage)
+Mann_Whitney_EDU_Incorporation_Score <- Utest.b5KD.vs.control_EDU$p.value
+
+print(Mann_Whitney_EDU_Incorporation_Score)
+
+```
+
+
+# Figure 7
+
+## Import Data for Figure 7
+```{r mport Data for Figure 7}
+
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+
+STORM.Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig7E_F", col_names = TRUE)
+
+```
+
+## Analysis of mitotic STORM data
+
+### STORM data wrangling2
+```{r STORM data wrangling2}
+## Determine CMAC.type (Reticular vs Focal depending on presence of A in $File (column))
+
+CMAC.type = c()
+for (cluster in 1:length(STORM.Data$File) ) {
+  CMAC.type[cluster] <- if(grepl("A", STORM.Data$File[cluster]) == TRUE) {
+    "Reticular"
+  } else if(grepl("T", STORM.Data$File[cluster]) == TRUE) {
+    "Focal"
+  } else if(grepl("NR", STORM.Data$File[cluster]) == TRUE) {
+    "Non-Retraction"
+  } else {
+    "Retraction"
+  }
+}
+
+STORM.Data$CMAC.type <- cbind(as.character(CMAC.type))
+
+## Unique nanocluster ID generation = merge of Folder, File and Cluster
+
+STORM.Data$Unique.ncID <- as.factor(paste(STORM.Data$Folder, STORM.Data$File, STORM.Data$Cluster))
+STORM.Data$Unique.CMACID <- as.factor(paste(STORM.Data$Folder, STORM.Data$File))
+```
+
+### Nearest Neighbour Analysis between localisations within unique nanoclusters2
+```{r Nearest Neighbour Analysis between localisations within unique nanoclusters2}
+## NND analysis of Incite3 data
+
+NNND <- c()
+for (i in 1:length(unique(STORM.Data$Unique.CMACID)) ) {
+  temp = STORM.Data[STORM.Data$Unique.CMACID == unique(STORM.Data$Unique.CMACID)[i], ]
+  NNND = append(NNND, nndist(temp$Centroid.nm., temp$Centroid.nm..1, k=1))
+}
+
+STORM.Data$NNND <- cbind(NNND)
+```
+
+### Boxplots summarising Nearest Neighbout Distance per nanocluster2
+```{r Boxplots summarising Nearest Neighbout Distance per nanocluster2}
+
+NNND.A = subset(STORM.Data$NNND, CMAC.type == "Non-Retraction")
+
+NNND.T = subset(STORM.Data$NNND, CMAC.type == "Retraction")
+
+
+TEST_nnnd_NRvsR <- wilcox.test(NNND.A, NNND.T, paired = FALSE)
+
+NNND_boxplot_filename <- "Panel 7E NNND boxplot"
+
+svglite(paste(panel_output_path, NNND_boxplot_filename, ".svg", sep = ""), width=4, height=3)
+
+boxplot(NNND ~ CMAC.type, subset(STORM.Data, CMAC.type == "Non-Retraction" | CMAC.type == "Retraction"), notch = TRUE, outline = FALSE,
+        main = "Nearest Neighbour Distance of Nanocluster by CMAC Type",
+        sub = TEST_nnnd_NRvsR$p.value,
+        xlab = "CMAC type", 
+        ylab = "Nearest Neighbour Distance (nm)",
+        plot = "TRUE"
+)
+
+dev.off()
+
+boxplot(NNND ~ CMAC.type, subset(STORM.Data, CMAC.type == "Non-Retraction" | CMAC.type == "Retraction"), notch = TRUE, outline = FALSE,
+        main = "Nearest Neighbour Distance of Nanocluster by CMAC Type",
+        sub = TEST_nnnd_NRvsR$p.value,
+        xlab = "CMAC type", 
+        ylab = "Nearest Neighbour Distance (nm)",
+        plot = "TRUE"
+)
+```
+
+### Boxplots summarising Molecular Localization per nanocluster2
+```{r Boxplots summarising Molecular Localization per nanocluster2}
+STORM.Data$Molecules <- as.numeric(STORM.Data$Molecules)
+
+Molecules.A = subset(STORM.Data$Molecules, CMAC.type == "Non-Retraction")
+
+Molecules.T = subset(STORM.Data$Molecules, CMAC.type == "Retraction")
+
+
+Mol_Count_boxplot_filename <- "Panel 7F Molecule Count boxplot"
+
+svglite(paste(panel_output_path, Mol_Count_boxplot_filename, ".svg", sep = ""), width=4, height=3)
+
+TEST_Molecules.A_RetvsFoc <- wilcox.test(Molecules.A, Molecules.T, paired = FALSE)
+boxplot(Molecules ~ CMAC.type, subset(STORM.Data, CMAC.type == "Non-Retraction" | CMAC.type == "Retraction"), notch = TRUE,outline = FALSE,
+        main = "Number of Integrin avb5 Molecules by CMAC Type",
+        sub = TEST_Molecules.A_RetvsFoc$p.value,
+        xlab = "CMAC type", 
+        ylab = "Number of Integrin avb5 Molecules",
+        plot = "TRUE"
+        )
+
+dev.off()
+
+TEST_Molecules.A_RetvsFoc <- wilcox.test(Molecules.A, Molecules.T, paired = FALSE)
+boxplot(Molecules ~ CMAC.type, subset(STORM.Data, CMAC.type == "Non-Retraction" | CMAC.type == "Retraction"), notch = TRUE,outline = FALSE,
+        main = "Number of Integrin avb5 Molecules by CMAC Type",
+        sub = TEST_Molecules.A_RetvsFoc$p.value,
+        xlab = "CMAC type", 
+        ylab = "Number of Integrin avb5 Molecules",
+        plot = "TRUE"
+        )
+
+```
+
+# Figure 8
+
+## Import Data for Figure 8
+```{r mport Data for Figure 8}
+
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+
+Residual_Angle_data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig8A_B", col_names = TRUE)
+
+Cell_Division_Defect_Quantification <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "Fig8C", col_names = TRUE)
+Cell_Division_Defect_Quantification <- Cell_Division_Defect_Quantification[1:9, 1:4]
+
+```
+
+## Residual Angle Comparisons per Condition
+### Fig 8A Plot Residual Angle Boxplot of +/- Beeswarm by condition
+```{r Plot Residual Angle Boxplot by condition}
+
+#define panel_file_name
+boxplot_panel_file_name <- "Panel 8A Residual Angle Boxplots"
+
+# oldpar <- par()
+# par(mfrow = c(1,1), mar = c(5,5,1,1))
+
+Residual_Angle_dataCN <- Residual_Angle_data
+
+# Set Condition order
+Residual_Angle_dataCN$Condition <- factor(Residual_Angle_dataCN$Condition, c("Control", "b5KD", "Rescue"))
+
+svglite(paste(panel_output_path, boxplot_panel_file_name, ".svg", sep = ""), width=4, height=6)
+
+boxplot(Pre.to.Post.Mitosis.Angle ~ Condition, data = Residual_Angle_dataCN, notch = T, varwidth = T, outline = F, ylab = "Residual Angle", col = c(control = "#49494A", b5KD = "#EC1C24", Rescue = "#BCBCBC"), ylim = c(0,115))
+beeswarm(Pre.to.Post.Mitosis.Angle ~ Condition, data = Residual_Angle_dataCN, method = 'center', add = T, col = "steelblue2", pch = 1, cex = 0.5)
+
+dev.off()
+
+boxplot(Pre.to.Post.Mitosis.Angle ~ Condition, data = Residual_Angle_dataCN, notch = T, varwidth = T, outline = F, ylab = "Residual Angle", col = c(control = "#49494A", b5KD = "#EC1C24", Rescue = "#BCBCBC"), ylim = c(0,115))
+beeswarm(Pre.to.Post.Mitosis.Angle ~ Condition, data = Residual_Angle_dataCN, method = 'center', add = T, col = "steelblue2", pch = 1, cex = 0.5)
+
+```
+
+
+### Fig 8B Plot Residual Angle smoothed density plot per condition
+```{r Plot Residual Angle smoothed density plot per condition}
+
+#define panel_file_name
+density_panel_file_name <- "Panel 8B Residual Angle Density Plot"
+
+svglite(paste(panel_output_path, density_panel_file_name, ".svg", sep = ""), width=4, height=6)
+
+sm.density.compare(Residual_Angle_dataCN$Pre.to.Post.Mitosis.Angle, Residual_Angle_dataCN$Condition, col = c("#49494A", "#EC1C24", "#BCBCBC"), lty = c(1,1,1), lwd = 2, h = 5, xlim = c(0,90), xlab = "Residual Angle")
+colfill<-c("#49494A", "#EC1C24", "#BCBCBC")
+legend(x=40, y=0.033, levels(Residual_Angle_dataCN$Condition), fill=colfill, bty = "n")
+
+dev.off()
+
+sm.density.compare(Residual_Angle_dataCN$Pre.to.Post.Mitosis.Angle, Residual_Angle_dataCN$Condition, col = c("#49494A", "#EC1C24", "#BCBCBC"), lty = c(1,1,1), lwd = 2, h = 5, xlim = c(0,90), xlab = "Residual Angle")
+colfill<-c("#49494A", "#EC1C24", "#BCBCBC")
+legend(x=40, y=0.033, levels(Residual_Angle_dataCN$Condition), fill=colfill, bty = "n")
+
+```
+
+#### Count cell number per condition
+```{r Count cell number per condition}
+Residual_Angle_dataCN %>%
+  group_by(Condition) %>%
+  summarise(
+    n = n())
+```
+
+
+#### Mann-Whitney µ test for Residual Angle differences
+```{r Mann-Whitney µ test for Residual Angle differences}
+
+#Note: Equivalent to Wilcoxon rank sum test as data is unpaired
+
+b5KD_Control <- subset(Residual_Angle_data, Residual_Angle_data$Condition == "b5KD" | Residual_Angle_data$Condition == "Control")
+Utest.b5KD.vs.control <- wilcox.test(Pre.to.Post.Mitosis.Angle ~ Condition, data = b5KD_Control)
+Utest.b5KD.vs.control.pval <- Utest.b5KD.vs.control$p.value
+
+b5KD_Rescue <- subset(Residual_Angle_data, Residual_Angle_data$Condition == "b5KD" | Residual_Angle_data$Condition == "Rescue")
+Utest.b5KD.vs.Rescue <- wilcox.test(Pre.to.Post.Mitosis.Angle ~ Condition, data = b5KD_Rescue)
+Utest.b5KD.vs.Rescue.pval <- Utest.b5KD.vs.Rescue$p.value
+
+Control_Rescue <- subset(Residual_Angle_data, Residual_Angle_data$Condition == "Control" | Residual_Angle_data$Condition == "Rescue")
+Utest.control.vs.Rescue <- wilcox.test(Pre.to.Post.Mitosis.Angle ~ Condition, data = Control_Rescue)
+Utest.control.vs.Rescue.pval <- Utest.control.vs.Rescue$p.value
+
+Mann_Whitney_Scores <- data.frame(Condition_Comparison = c("b5KD_vs_Control", "b5KD_vs_Rescue", "Control_vs_Rescue"))
+Mann_Whitney_Scores$pvalue <- rbind(Utest.b5KD.vs.control.pval, Utest.b5KD.vs.Rescue.pval, Utest.control.vs.Rescue.pval)
+
+print(Mann_Whitney_Scores)
+
+```
+
+## Residual Angle Comparisons per Condition per Experiment
+### Plot Residual Angle Boxplot by condition by experiment
+```{r Plot Residual Angle Boxplot by condition by experiment}
+Residual_Angle_dataFN <- Residual_Angle_data
+
+Residual_Angle_dataFN$File.Name <- factor(Residual_Angle_dataFN$File.Name, c("_3_MMStack_control Hela 01.ome.tif", "_3_MMStack_control Hela 02.ome.tif", "_3_MMStack_b5 KD plus GFP 01.ome.tif", "_3_MMStack_b5 KD plus GFP 02.ome.tif", "_3_MMStack_b5 KD plus WTb5-GFP 01.ome.tif", "_3_MMStack_b5 KD plus WTb5-GFP 02.ome.tif"))
+
+
+boxplot(Pre.to.Post.Mitosis.Angle ~ File.Name, data = Residual_Angle_dataFN, notch = T, varwidth = T, outline = F, ylab = "Residual Angle", col = c("#49494A", "#49494A", "#EC1C24", "#EC1C24","#BCBCBC", "#BCBCBC"), ylim = c(0,115), names = c("Ctrl_01", "Ctrl_02", "b5KD_01", "b5KD_02", "Resc_01", "Resc_02"))
+
+# beeswarm(Pre.to.Post.Mitosis.Angle ~ File.Name, data = Residual_Angle_dataFN, method = 'swarm', add = T, col = "steelblue2", pch = 0, cex = 0.7)
+
+```
+
+### Plot Plot Residual Angle smoothed density plot per condition per experiment
+```{r Plot Residual Angle smoothed density plot per condition per experiment}
+
+sm.density.compare(Residual_Angle_dataFN$Pre.to.Post.Mitosis.Angle, Residual_Angle_dataFN$File.Name, col = c("#49494A", "#49494A", "#EC1C24", "#EC1C24","#BCBCBC","#BCBCBC"), h=5, lty = c(1,5,1,5,1,5), lwd = 2, xlim = c(0,90), xlab = "Residual Angle")
+legend(x=23, y= 0.05, levels(Residual_Angle_dataFN$File.Name), fill=c("#49494A", "#49494A", "#EC1C24", "#EC1C24","#BCBCBC","#BCBCBC"), bty = 'n')
+
+```
+#### Count cell number per condition per experiment
+```{r Count cell number per condition per experiment}
+Residual_Angle_dataFN %>%
+  group_by(File.Name) %>%
+  summarise(
+    n = n())
+```
+
+
+
+## Cell Division Defect Quantification
+### Fig 8C Cell Division Defect Rate Plotting
+```{r Cell Division Defect Rate Plotting}
+
+CDD_boxplot_panel_file_name <- "Panel 8C Cell Division Defect Rate Boxplot"
+
+Cell_Division_Defect_Quantification$Condition <- factor(Cell_Division_Defect_Quantification$Condition, c("Control", "b5KD", "Rescue"))
+
+svglite(paste(panel_output_path, CDD_boxplot_panel_file_name, ".svg", sep = ""), width=4, height=6)
+
+boxplot(normal.cell.division ~ Condition, data = Cell_Division_Defect_Quantification, outline = FALSE, boxlty = 0, whisklty = 0, staplelty = 0, ylab = "Normal Division Percentage", ylim = c(0,115), medlwd = 0.0)
+beeswarm(normal.cell.division ~ Condition, data = Cell_Division_Defect_Quantification, method = 'center', add = T, col = c(control = "#49494A", b5KD = "#EC1C24", Rescue = "#BCBCBC"), ylim = c(0,115), pch = 19, cex = 1.3)
+
+dev.off()
+
+boxplot(normal.cell.division ~ Condition, data = Cell_Division_Defect_Quantification, outline = FALSE, boxlty = 0, whisklty = 0, staplelty = 0, ylab = "Normal Division Percentage", ylim = c(0,115), medlwd = 0.0)
+beeswarm(normal.cell.division ~ Condition, data = Cell_Division_Defect_Quantification, method = 'center', add = T, col = c(control = "#49494A", b5KD = "#EC1C24", Rescue = "#BCBCBC"), ylim = c(0,115), pch = 19, cex = 1.3)
+
+```
+
+#### Cell Division Defect Summaries 
+```{r Cell Division Defect Quantification}
+
+Division_Defect_Summary <- Cell_Division_Defect_Quantification %>%
+  group_by(Condition) %>%
+  summarise(
+    Normal_Division = mean(normal.cell.division),
+    Abnormal_Division = mean(abnormal.cell.division)
+  )
+ 
+print(Division_Defect_Summary)   
+
+```
+
+#### T-testing for Cell Division Defect Rate differences
+```{r T-testing for Cell Division Defect Rates differences}
+
+b5KD_Control_CDD <- subset(Cell_Division_Defect_Quantification, Condition == "b5KD" | Condition == "Control")
+T_test_b5KD_Control_CDD <- t.test(normal.cell.division ~ Condition, data = b5KD_Control_CDD)$p.value
+
+b5KD_Rescue_CDD <- subset(Cell_Division_Defect_Quantification, Condition == "b5KD" | Condition == "Rescue")
+T_test_b5KD_Rescue_CDD <- t.test(normal.cell.division ~ Condition, data = b5KD_Rescue_CDD)$p.value
+
+Control_Rescue_CDD <- subset(Cell_Division_Defect_Quantification, Condition == "Control" | Condition == "Rescue")
+T_test_Control_Rescue_CDD <- t.test(normal.cell.division ~ Condition, data = Control_Rescue_CDD)$p.value
+
+Ttest_Scores_CDD <- data.frame(Condition_Comparison = c("b5KD_Control_CDD", "b5KD_Rescue_CDD", "Control_Rescue_CDD"))
+Ttest_Scores_CDD$pvalue <- rbind(T_test_b5KD_Control_CDD, T_test_b5KD_Rescue_CDD, T_test_Control_Rescue_CDD)
+
+print(Ttest_Scores_CDD)
+
+```
+
+# Supp Fig 5
+
+## Import Data Supp Fig 5
+```{r Import Data Supp Fig 5}
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+
+Arp23_Inhibition_Data <- read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "SuppFig5C", col_names = TRUE)
+
+Arp23_Inhibition_Data$Drug <- recode(Arp23_Inhibition_Data$Drug, Arp_Inhib_CTRL_689 = "Inhib_CTRL_689")
+
+```
+
+## Analyse Arp2/3 inhibitor responses relative to control
+
+### Boxplot changes in reticular adhesion b5 intensity2
+```{r Boxplot changes in reticular adhesion b5 intensity2}
+Arp23_b5_intensity_boxplots_filename <- "Panel SF5C Arp23_b5_intensity_boxplots"
+
+cell.numbers.ARP23.screen <- count(Arp23_Inhibition_Data, Drug)
+count(Arp23_Inhibition_Data, Drug)
+mean.cell.numbers.ARP23.screen <- summarise(cell.numbers.ARP23.screen, avg = mean(n), SD = sd(n), sum(n))
+summarise(cell.numbers.ARP23.screen, avg = mean(n), SD = sd(n), sum(n))
+
+
+svglite(paste(panel_output_path, Arp23_b5_intensity_boxplots_filename, ".svg", sep = ""), width=7, height=5)
+
+p1 <- ggplot(Arp23_Inhibition_Data, aes(x=Drug, y=Median.Mean..z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Inhib_CTRL_689", "Arp_Inhib_666")) +
+  theme(axis.text.x  = element_text(angle=45, hjust = 1)) +
+  ylim(-3, 6) + ylab("Mean Reticular Adhesion Intensity") + theme(legend.position="none")
+
+
+## plot T-CMAC intensity Z-score ggplot2 boxplot - per Drug 
+
+p2 <- ggplot(Arp23_Inhibition_Data, aes(x=Drug, y=Median.Mean._T.CMACs.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Inhib_CTRL_689", "Arp_Inhib_666")) +
+  theme(axis.text.x  = element_text(angle=45, hjust = 1)) +
+  ylim(-3, 6) + ylab("Mean Focal Adhesion Intensity") + theme(legend.position="none")
+
+## plot intensity ratio Z-score ggplot2 boxplot - per Drug 
+
+p3 <- ggplot(Arp23_Inhibition_Data, aes(x=Drug, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Inhib_CTRL_689", "Arp_Inhib_666")) +
+  theme(axis.text.x  = element_text(angle=45, hjust = 1)) +
+  ylim(-3, 6) + ylab("Ratio Reticular:Focal Adhesion Intensity") + theme(legend.position="none")
+
+grid.arrange(p1, p2, p3, ncol = 3)
+
+dev.off()
+
+p1 <- ggplot(Arp23_Inhibition_Data, aes(x=Drug, y=Median.Mean..z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Inhib_CTRL_689", "Arp_Inhib_666")) +
+  theme(axis.text.x  = element_text(angle=45, hjust = 1)) +
+  ylim(-3, 6) + ylab("Mean Reticular Adhesion Intensity") + theme(legend.position="none")
+
+## plot T-CMAC intensity Z-score ggplot2 boxplot - per Drug 
+
+p2 <- ggplot(Arp23_Inhibition_Data, aes(x=Drug, y=Median.Mean._T.CMACs.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Inhib_CTRL_689", "Arp_Inhib_666")) +
+  theme(axis.text.x  = element_text(angle=45, hjust = 1)) +
+  ylim(-3, 6) + ylab("Mean Focal Adhesion Intensity") + theme(legend.position="none")
+
+## plot intensity ratio Z-score ggplot2 boxplot - per Drug 
+
+p3 <- ggplot(Arp23_Inhibition_Data, aes(x=Drug, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(Drug))) + 
+  geom_boxplot(notch = TRUE, outlier.colour = "NA") + 
+  scale_x_discrete(limits=c("Inhib_CTRL_689", "Arp_Inhib_666")) +
+  theme(axis.text.x  = element_text(angle=45, hjust = 1)) +
+  ylim(-3, 6) + ylab("Ratio Reticular:Focal Adhesion Intensity") + theme(legend.position="none")
+
+grid.arrange(p1, p2, p3, ncol = 3)
+
+```
+
+### Mann-Whitney test for significant Drug treatment effects on Reticular adhesion intensity2
+```{r Mann-Whitney test for significant Drug treatment effects on Reticular adhesion intensity2}
+p_values <- c()
+for (i in 1:length(unique(Arp23_Inhibition_Data$Drug))){
+  for (j in 1:length(unique(Arp23_Inhibition_Data$Drug))){
+    Drug_1 = subset(Arp23_Inhibition_Data, Arp23_Inhibition_Data$Drug == unique(Arp23_Inhibition_Data$Drug)[i])
+    Drug_1$Drug_Number = as.factor(i)
+    Drug_2 = subset(Arp23_Inhibition_Data, Arp23_Inhibition_Data$Drug == unique(Arp23_Inhibition_Data$Drug)[j])
+    Drug_2$Drug_Number = as.factor(j+100)
+    Drug_Pair = rbind(Drug_1, Drug_2)
+    Drug_Pair_ttest = wilcox.test(Median.Mean..z.score ~ Drug_Number, data = Drug_Pair)$p.value
+    p_values = rbind(p_values, Drug_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Arp23_Inhibition_Data$Drug)),ncol = length(unique(Arp23_Inhibition_Data$Drug)))
+columns <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+rows <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix6 <- matrix(corrected_p_values,nrow = length(unique(Arp23_Inhibition_Data$Drug)),ncol = length(unique(Arp23_Inhibition_Data$Drug)))
+columns <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+rows <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix6, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+```
+
+### Mann-Whitney test for significant Drug treatment effects on Focal adhesion intensity2
+```{r Mann-Whitney test for significant Drug treatment effects on Focal adhesion intensity2}
+p_values <- c()
+for (i in 1:length(unique(Arp23_Inhibition_Data$Drug))){
+  for (j in 1:length(unique(Arp23_Inhibition_Data$Drug))){
+    Drug_1 = subset(Arp23_Inhibition_Data, Arp23_Inhibition_Data$Drug == unique(Arp23_Inhibition_Data$Drug)[i])
+    Drug_1$Drug_Number = as.factor(i)
+    Drug_2 = subset(Arp23_Inhibition_Data, Arp23_Inhibition_Data$Drug == unique(Arp23_Inhibition_Data$Drug)[j])
+    Drug_2$Drug_Number = as.factor(j+100)
+    Drug_Pair = rbind(Drug_1, Drug_2)
+    Drug_Pair_ttest = wilcox.test(Median.Mean._T.CMACs.z.score ~ Drug_Number, data = Drug_Pair)$p.value
+    p_values = rbind(p_values, Drug_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Arp23_Inhibition_Data$Drug)),ncol = length(unique(Arp23_Inhibition_Data$Drug)))
+columns <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+rows <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix7 <- matrix(corrected_p_values,nrow = length(unique(Arp23_Inhibition_Data$Drug)),ncol = length(unique(Arp23_Inhibition_Data$Drug)))
+columns <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+rows <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix7, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+```
+
+### Mann-Whitney test for significant Drug treatment effects on intensity ratio Z-score2
+```{r Mann-Whitney test for significant Drug treatment effects on intensity ratio Z-score2}
+p_values <- c()
+for (i in 1:length(unique(Arp23_Inhibition_Data$Drug))){
+  for (j in 1:length(unique(Arp23_Inhibition_Data$Drug))){
+    Drug_1 = subset(Arp23_Inhibition_Data, Arp23_Inhibition_Data$Drug == unique(Arp23_Inhibition_Data$Drug)[i])
+    Drug_1$Drug_Number = as.factor(i)
+    Drug_2 = subset(Arp23_Inhibition_Data, Arp23_Inhibition_Data$Drug == unique(Arp23_Inhibition_Data$Drug)[j])
+    Drug_2$Drug_Number = as.factor(j+100)
+    Drug_Pair = rbind(Drug_1, Drug_2)
+    Drug_Pair_ttest = wilcox.test(Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score ~ Drug_Number, data = Drug_Pair)$p.value 
+    p_values = rbind(p_values, Drug_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(Arp23_Inhibition_Data$Drug)),ncol = length(unique(Arp23_Inhibition_Data$Drug)))
+columns <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+rows <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix8 <- matrix(corrected_p_values,nrow = length(unique(Arp23_Inhibition_Data$Drug)),ncol = length(unique(Arp23_Inhibition_Data$Drug)))
+columns <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+rows <- as.vector(unique(Arp23_Inhibition_Data$Drug))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix8, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+```
+
+# Supp Fig 6
+
+## Import Data Supp Fig 6
+```{r Import Data Supp Fig 6}
+# Set your path to input data
+data_input_path <- "/Users/johnlock/Dropbox/A-CMAC Manchester collaboration/NCB submission documents/Resubmission 2/Source_Data"
+data_file <- "Supplementary Table 1 Statistics Source Data.xlsx"
+
+# Import individual data files
+
+Secondary.siRNA.Screen.Data <-  read_xlsx(paste(data_input_path, data_file, sep = "/"), sheet = "SuppFig6A", col_names = TRUE)
+
+```
+
+## Analyse Secondary siRNA Screen responses
+
+### Boxplot changes in reticular to focal adhesion b5 intensity ratio
+```{r Boxplot changes in reticular to focal adhesion b5 intensity ratio}
+Secondary_siRNA_Screen_boxplots_filename <- "Panel SF6A Secondary_siRNA_Screen_boxplot_summary"
+
+Secondary.siRNA.Screen.Data$siRNA_Target <- recode(Secondary.siRNA.Screen.Data$siRNA_Target, PIK3C2a_1 = "PIK3C2A_1")
+Secondary.siRNA.Screen.Data$siRNA_Target <- recode(Secondary.siRNA.Screen.Data$siRNA_Target, PIK3C2a_2 = "PIK3C2A_2")
+Secondary.siRNA.Screen.Data$siRNA_Target <- recode(Secondary.siRNA.Screen.Data$siRNA_Target, PIK3C2a_3 = "PIK3C2A_3")
+Secondary.siRNA.Screen.Data$siRNA_Target <- recode(Secondary.siRNA.Screen.Data$siRNA_Target, PIK3C2a_4 = "PIK3C2A_4")
+
+cell.numbers.secondary.screen <- count(Secondary.siRNA.Screen.Data, siRNA_Target)
+count(Secondary.siRNA.Screen.Data, siRNA_Target)
+mean.cell.numbers.secondary.screen <- summarise(cell.numbers.secondary.screen, avg = mean(n), SD = sd(n), sum(n))
+summarise(cell.numbers.secondary.screen, avg = mean(n), SD = sd(n), sum(n))
+
+svglite(paste(panel_output_path, Secondary_siRNA_Screen_boxplots_filename, ".svg", sep = ""), width=7, height=5)
+
+ggplot(Secondary.siRNA.Screen.Data, aes(x=siRNA_Target, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(siRNA_Treatment_Type))) +
+  geom_boxplot(notch = TRUE, outlier.colour = "NA")  +
+  theme(axis.text.x  = element_text(angle=90)) +
+  ylim(-3, 6) + 
+  scale_x_discrete(limits=c("Untreated","MOCK","SST_3Ctrl_Pool", "ON-TARGETplus Non-targeting Control",
+                          "siGENOME Non-targeting Control", "EGFP", "ITGAV", "ITGB5", "OCRL_1", "OCRL_2", "OCRL_3", "OCRL_4", "PI4K2A_1", "PI4K2A_2", "PI4K2A_3", "PI4K2A_4", "PI4KA_1", "PI4KA_2", "PI4KA_3", "PI4KA_4", "PIP5K1B_1", "PIP5K1B_2", "PIP5K1B_3", "PIP5K1B_4", "PIP5K1C_1", "PIP5K1C_2", "PIP5K1C_3", "PIP5K1C_4", "PTEN_1", "PTEN_2", "PTEN_3", "PTEN_4", "PIK3C2A_1", "PIK3C2A_2", "PIK3C2A_3", "PIK3C2A_4"))
+
+dev.off()
+
+ggplot(Secondary.siRNA.Screen.Data, aes(x=siRNA_Target, y=Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score, color = factor(siRNA_Treatment_Type))) +
+  geom_boxplot(notch = TRUE, outlier.colour = "NA")  +
+  theme(axis.text.x  = element_text(angle=90)) +
+  ylim(-3, 6) + 
+  scale_x_discrete(limits=c("Untreated","MOCK","SST_3Ctrl_Pool", "ON-TARGETplus Non-targeting Control",
+                          "siGENOME Non-targeting Control", "EGFP", "ITGAV", "ITGB5", "OCRL_1", "OCRL_2", "OCRL_3", "OCRL_4", "PI4K2A_1", "PI4K2A_2", "PI4K2A_3", "PI4K2A_4", "PI4KA_1", "PI4KA_2", "PI4KA_3", "PI4KA_4", "PIP5K1B_1", "PIP5K1B_2", "PIP5K1B_3", "PIP5K1B_4", "PIP5K1C_1", "PIP5K1C_2", "PIP5K1C_3", "PIP5K1C_4", "PTEN_1", "PTEN_2", "PTEN_3", "PTEN_4", "PIK3C2A_1", "PIK3C2A_2", "PIK3C2A_3", "PIK3C2A_4"))
+
+```
+
+### Mann-Whitney test for significant siRNA treatment effects2
+```{r Mann-Whitney test for significant siRNA treatment effects2}
+siRNA.conditions.for.U.test <- subset(Secondary.siRNA.Screen.Data, siRNA_Target != "Untreated" & siRNA_Target != "MOCK" & siRNA_Target != "SST_3Ctrl_Pool" & siRNA_Target != "siGENOME Non-targeting Control") 
+
+p_values <- c()
+for (i in 1:length(unique(siRNA.conditions.for.U.test$siRNA_Target))){
+  for (j in 1:length(unique(siRNA.conditions.for.U.test$siRNA_Target))){
+    siRNA_Target_1 = subset(siRNA.conditions.for.U.test, siRNA.conditions.for.U.test$siRNA_Target == unique(siRNA.conditions.for.U.test$siRNA_Target)[i])
+    siRNA_Target_1$siRNA_Target_Number = as.factor(i)
+    siRNA_Target_2 = subset(siRNA.conditions.for.U.test, siRNA.conditions.for.U.test$siRNA_Target == unique(siRNA.conditions.for.U.test$siRNA_Target)[j])
+    siRNA_Target_2$siRNA_Target_Number = as.factor(j+100)
+    siRNA_Target_Pair = rbind(siRNA_Target_1, siRNA_Target_2)
+    siRNA_Target_Pair_ttest = wilcox.test(Ratio_A.CMAC.to.T.CMAC_mean_intensity.z.score ~ siRNA_Target_Number, data = siRNA_Target_Pair)$p.value
+    p_values = rbind(p_values, siRNA_Target_Pair_ttest)
+  }
+}
+
+p_values <- as.vector(p_values)
+
+p_value_matrix <- matrix(p_values,nrow = length(unique(siRNA.conditions.for.U.test$siRNA_Target)),ncol = length(unique(siRNA.conditions.for.U.test$siRNA_Target)))
+columns <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+rows <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+p_value_dataframe <- as.data.frame(p_value_matrix, row.names = rows)
+names(p_value_dataframe) <- columns
+
+# print(p_value_dataframe)
+
+# Introduce Holm (also called Holm-Bonferroni) p-value correction (used because it gives same stringency against false positives (type 1 errors) with lower probability of false negatives (type 2 errors)))
+
+corrected_p_values <- p.adjust(p_values, method = "holm", n = length(p_values))
+
+corrected_p_value_matrix9 <- matrix(corrected_p_values,nrow = length(unique(siRNA.conditions.for.U.test$siRNA_Target)),ncol = length(unique(siRNA.conditions.for.U.test$siRNA_Target)))
+columns <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+rows <- as.vector(unique(siRNA.conditions.for.U.test$siRNA_Target))
+corrected_p_value_dataframe <- as.data.frame(corrected_p_value_matrix9, row.names = rows)
+names(corrected_p_value_dataframe) <- columns
+
+print(corrected_p_value_dataframe)
+
+```
+
+### Plot heatmap of corrected p_values2
+```{r Plot heatmap of corrected p_values2, fig.height=8, fig.width=8}
+heatmap.2(log(corrected_p_value_matrix9), dendrogram = 'none', Rowv = FALSE, Colv = FALSE, labRow = rows, labCol = columns, srtCol = 45, cexRow = 1, cexCol = 1, margins = c(7, 9), symm = TRUE, revC = FALSE, breaks = c(log(1e-300), log(1e-50), log(1e-10), log(1e-6), log(0.001), log(0.01), log(0.05), log(1)), rowsep = 1:nrow(corrected_p_value_matrix9), colsep = 1:ncol(corrected_p_value_matrix9), sepcolor = 'darkgrey', sepwidth = c(0.02,0.02), trace = 'none', col = c("darkred", "red", "orange", "green", "blue", "purple", "lightgrey"), denscol = NULL, keysize = 1.5, key.title = NA)
+```
